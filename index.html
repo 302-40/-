@@ -1,0 +1,50 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>記帳本</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <button id="expenseBtn" class="active">支出</button>
+    <button id="incomeBtn">收入</button>
+  </header>
+
+  <main>
+    <div class="month-nav">
+      <button id="prevMonth">◀</button>
+      <h2 id="currentMonth">2025年1月</h2>
+      <button id="nextMonth">▶</button>
+    </div>
+
+    <canvas id="myChart" width="300" height="300"></canvas>
+
+    <section id="details">
+      <h3>明細</h3>
+      <ul id="detailsList"></ul>
+    </section>
+  </main>
+
+  <div id="chartContainer"></div>
+  <h2 id="totalAmount">本月總金額：$0</h2>
+  <div id="chartContainer">
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <div id="controls">
+    <button id="prevMonth">上個月</button>
+    <select id="monthSelector"></select>
+    <button id="nextMonth">下個月</button>
+  </div>
+  
+  
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
+<button id="downloadBtn">下載本月報表 📥</button>
