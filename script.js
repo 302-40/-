@@ -1,224 +1,231 @@
-// public/script.js
-const ctx = document.getElementById('myChart').getContext('2d');
-let currentMonth = '2025-01';
-let currentType = 'expense';
+let currentType = 'expenses';
+let currentMonth = new Date().toISOString().slice(0, 7);
 
-const monthText = document.getElementById('currentMonth');
-const detailsList = document.getElementById('detailsList');
-const expenseBtn = document.getElementById('expenseBtn');
-const incomeBtn = document.getElementById('incomeBtn');
+// DOM 元素
+const chart = document.getElementById('chart').getContext('2d');
+const details = document.getElementById('details');
+const addForm = document.getElementById('addTransactionForm');
+const typeBtns = document.querySelectorAll('.type-btn');
+const monthText = document.getElementById('month');
+const prevMonthBtn = document.getElementById('prev-month');
+const nextMonthBtn = document.getElementById('next-month');
+const downloadBtn = document.getElementById('download-btn');
+const categorySelect = document.getElementById('transactionCategory');
+const transactionTypeInput = document.getElementById('transactionType');
+const expenseBtn = document.getElementById('selectExpense');
+const incomeBtn = document.getElementById('selectIncome');
+const successMessage = document.getElementById('successMessage');
 
-let chart;
+let pieChart;
 
-function fetchData() {
+// 初始化
+updateMonthText();
+loadData();
+loadCategories();
+
+// 收支切換（圖表）
+typeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentType = btn.dataset.type;
+    typeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadData();
+    loadCategories();
+  });
+});
+
+// 收支切換（表單）
+expenseBtn.addEventListener('click', () => {
+  expenseBtn.classList.add('active');
+  incomeBtn.classList.remove('active');
+  transactionTypeInput.value = 'expense';
+});
+
+incomeBtn.addEventListener('click', () => {
+  incomeBtn.classList.add('active');
+  expenseBtn.classList.remove('active');
+  transactionTypeInput.value = 'income';
+});
+
+// 表單送出
+addForm.addEventListener('submit', function (event) {
+  event.preventDefault();
+
+  const data = {
+    type: transactionTypeInput.value,
+    date: document.getElementById('transactionDate').value,
+    category: document.getElementById('transactionCategory').value,
+    amount: Number(document.getElementById('transactionAmount').value),
+  };
+
+  fetch(`/api/${data.type}s`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('新增失敗');
+      showSuccessMessage();
+      addForm.reset();
+      expenseBtn.click(); // 重設為預設支出
+      loadData();
+    })
+    .catch(err => {
+      console.error(err);
+      alert('發生錯誤：' + err.message);
+    });
+});
+
+// 月份切換
+prevMonthBtn.addEventListener('click', () => {
+  const d = new Date(currentMonth + '-01');
+  d.setMonth(d.getMonth() - 1);
+  currentMonth = d.toISOString().slice(0, 7);
+  updateMonthText();
+  loadData();
+});
+
+nextMonthBtn.addEventListener('click', () => {
+  const d = new Date(currentMonth + '-01');
+  d.setMonth(d.getMonth() + 1);
+  currentMonth = d.toISOString().slice(0, 7);
+  updateMonthText();
+  loadData();
+});
+
+// 顯示月份（中文格式）
+function updateMonthText() {
+  const [year, month] = currentMonth.split('-');
+  monthText.textContent = `${year}年${parseInt(month)}月`;
+}
+
+// 顯示成功訊息
+function showSuccessMessage() {
+  successMessage.style.display = 'block';
+  successMessage.style.opacity = '1';
+
+  setTimeout(() => {
+    successMessage.style.opacity = '0';
+  }, 2000);
+  setTimeout(() => {
+    successMessage.style.display = 'none';
+  }, 2500);
+}
+
+// 載入分類選單
+function loadCategories() {
+  fetch(`/api/${currentType}/categories`)
+    .then(res => res.json())
+    .then(categories => {
+      categorySelect.innerHTML = '';
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      alert('無法載入分類');
+    });
+}
+
+// 載入圖表與細項
+function loadData() {
   fetch(`/api/${currentType}?month=${currentMonth}`)
     .then(res => res.json())
     .then(data => {
       updateChart(data);
       updateDetails(data);
+    })
+    .catch(err => {
+      console.error(err);
+      alert('資料載入失敗');
     });
 }
 
+// 更新圖表
 function updateChart(data) {
-  const labels = data.map(item => item.name);
-  const amounts = data.map(item => item.amount);
+  const labels = data.map(item => item.category);
+  const values = data.map(item => item.total);
 
-  if (chart) {
-    chart.destroy();
-  }
-
-  chart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: labels,
-      datasets: [{
-        data: amounts,
-        backgroundColor: ['#70d6ff', '#0077b6', '#90e0ef']
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false
-    }
-  });
-}
-
-function updateDetails(data) {
-  detailsList.innerHTML = '';
-  data.forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = `${item.name}: ${item.amount}元`;
-    detailsList.appendChild(li);
-  });
-}
-
-function changeMonth(step) {
-  let [year, month] = currentMonth.split('-').map(Number);
-  month += step;
-  if (month <= 0) {
-    month = 12;
-    year--;
-  } else if (month > 12) {
-    month = 1;
-    year++;
-  }
-  currentMonth = `${year}-${month.toString().padStart(2, '0')}`;
-  monthText.textContent = `${year}年${month}月`;
-  fetchData();
-}
-
-// 按鈕切換
-expenseBtn.addEventListener('click', () => {
-  currentType = 'expense';
-  expenseBtn.classList.add('active');
-  incomeBtn.classList.remove('active');
-  fetchData();
-});
-
-incomeBtn.addEventListener('click', () => {
-  currentType = 'income';
-  incomeBtn.classList.add('active');
-  expenseBtn.classList.remove('active');
-  fetchData();
-});
-
-document.getElementById('prevMonth').addEventListener('click', () => {
-    currentMonth = getPreviousMonth(currentMonth);
-    loadChartWithAnimation(currentMonth);
-  });
-  
-  document.getElementById('nextMonth').addEventListener('click', () => {
-    currentMonth = getNextMonth(currentMonth);
-    loadChartWithAnimation(currentMonth);
-  });
-  
-
-  function loadChart(month) {
-    const chartContainer = document.getElementById('chartContainer');
-    const totalAmountElement = document.getElementById('totalAmount');
-    const chartType = document.getElementById('chartType').value;
-    const category = chartType === 'expense' ? 'expense' : 'income';
-  
-    fetch(`/api/records?month=${month}&category=${category}`)
-      .then(response => response.json())
-      .then(data => {
-        // 計算總金額
-        const total = data.reduce((sum, item) => sum + item.amount, 0);
-        totalAmountElement.textContent = `本月${category === 'expense' ? '總支出' : '總收入'}：$${total}`;
-  
-        // 如果沒有資料
-        if (data.length === 0) {
-          chartContainer.innerHTML = `<div class="no-data">這個月沒有${category === 'expense' ? '支出' : '收入'}資料唷😸</div>`;
-          return;
-        }
-  
-        const ctx = document.getElementById('myChart').getContext('2d');
-        if (myChart) {
-          myChart.destroy();
-        }
-        myChart = new Chart(ctx, {
-          type: 'pie',
-          data: {
-            labels: data.map(item => item.name),
-            datasets: [{
-              data: data.map(item => item.amount),
-              backgroundColor: generateColors(data.length),
-            }]
-          },
-          options: {
-            responsive: true,
-          }
-        });
-      });
-  }
-  
-  document.getElementById('prevMonth').addEventListener('click', () => {
-    changeMonth(-1);
-  });
-  
-  document.getElementById('nextMonth').addEventListener('click', () => {
-    changeMonth(1);
-  });
-  
-  function changeMonth(offset) {
-    const monthSelector = document.getElementById('monthSelector');
-    let currentIndex = monthSelector.selectedIndex;
-    let newIndex = currentIndex + offset;
-  
-    if (newIndex >= 0 && newIndex < monthSelector.options.length) {
-      monthSelector.selectedIndex = newIndex;
-      const selectedMonth = monthSelector.value;
-      loadChart(selectedMonth);
-    }
-  }
-
-  myChart = new Chart(ctx, {
+  if (pieChart) pieChart.destroy();
+  pieChart = new Chart(chart, {
     type: 'pie',
     data: {
-      labels: data.map(item => item.name),
+      labels,
       datasets: [{
-        data: data.map(item => item.amount),
-        backgroundColor: generateColors(data.length),
-      }]
+        data: values,
+        backgroundColor: generateColors(values.length),
+      }],
     },
     options: {
-      responsive: true,
       onClick: (e, elements) => {
         if (elements.length > 0) {
           const index = elements[0].index;
-          const categoryName = data[index].name;
-          showDetails(categoryName, month, category);
+          const category = labels[index];
+          loadDetails(category);
         }
-      }
-    }
+      },
+    },
   });
-  
-  function showDetails(name, month, category) {
-    fetch(`/api/records/details?month=${month}&category=${category}&name=${encodeURIComponent(name)}`)
-      .then(response => response.json())
-      .then(details => {
-        if (details.length === 0) {
-          alert(`沒有找到 ${name} 的詳細紀錄喔！`);
-          return;
-        }
-        
-        let message = `${name} 的詳細紀錄：\n\n`;
-        details.forEach((item, index) => {
-          message += `${index + 1}. 🗓️ ${item.date} - 💵 $${item.amount} - 📝 ${item.note || '無備註'}\n`;
-        });
-        
-        const toDelete = prompt(`${message}\n想刪除哪一筆？請輸入編號（或取消）`);
-  
-        if (toDelete !== null) {
-          const selectedIndex = parseInt(toDelete, 10) - 1;
-          if (!isNaN(selectedIndex) && selectedIndex >= 0 && selectedIndex < details.length) {
-            const recordId = details[selectedIndex].id;
-            deleteRecord(recordId, month);
-          } else {
-            alert('輸入錯誤喔！請輸入正確的編號');
-          }
-        }
-      });
-  }
-  
-  function deleteRecord(id, month) {
-    fetch(`/api/records/${id}`, {
-      method: 'DELETE'
-    })
-      .then(response => response.json())
-      .then(result => {
-        if (result.success) {
-          alert('刪除成功！');
-          loadChart(month); // 重新載入當月圖表
-        } else {
-          alert('刪除失敗，請稍後再試～');
-        }
-      });
-  }
-  
+}
 
-  document.getElementById('downloadBtn').addEventListener('click', () => {
-    const month = document.getElementById('monthPicker').value;
-    window.location.href = `/api/records/download?month=${month}`;
+// 更新分類總表
+function updateDetails(data) {
+  details.innerHTML = '';
+  data.forEach(item => {
+    const div = document.createElement('div');
+    div.textContent = `${item.category}: $${item.total}`;
+    details.appendChild(div);
   });
-  
+}
+
+// 顯示分類明細
+function loadDetails(category) {
+  fetch(`/api/${currentType}/details?month=${currentMonth}&category=${encodeURIComponent(category)}`)
+    .then(res => res.json())
+    .then(data => {
+      details.innerHTML = '';
+      data.forEach(record => {
+        const div = document.createElement('div');
+        div.innerHTML = `#${record.id} ${record.date} $${record.amount} <span style="color:red; cursor:pointer;">❌</span>`;
+        const deleteBtn = div.querySelector('span');
+        deleteBtn.addEventListener('click', () => deleteRecord(record.id, deleteBtn));
+        details.appendChild(div);
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      alert('載入明細失敗');
+    });
+}
+
+// 刪除紀錄
+function deleteRecord(id, deleteBtn) {
+  if (!confirm(`確定要刪除編號 #${id} 嗎？`)) return;
+  deleteBtn.textContent = '⌛';
+  deleteBtn.style.pointerEvents = 'none';
+
+  fetch(`/api/${currentType}/${id}`, {
+    method: 'DELETE',
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('刪除失敗');
+      loadData();
+    })
+    .catch(err => {
+      console.error(err);
+      alert('刪除錯誤：' + err.message);
+    });
+}
+
+// 產生圓餅圖顏色
+function generateColors(num) {
+  const colors = [];
+  for (let i = 0; i < num; i++) {
+    colors.push(`hsl(${(i * 360) / num}, 70%, 70%)`);
+  }
+  return colors;
+}

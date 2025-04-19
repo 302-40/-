@@ -1,4 +1,3 @@
-<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -8,43 +7,54 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <header>
-    <button id="expenseBtn" class="active">支出</button>
-    <button id="incomeBtn">收入</button>
-  </header>
-
   <main>
-    <div class="month-nav">
-      <button id="prevMonth">◀</button>
-      <h2 id="currentMonth">2025年1月</h2>
-      <button id="nextMonth">▶</button>
+    <!-- 新增交易區塊放在最上方 -->
+    <section id="addTransactionSection">
+      <h2>新增交易</h2>
+      <form id="addTransactionForm">
+        <select id="transactionType">
+          <option value="expense">支出</option>
+          <option value="income">收入</option>
+        </select>
+        <input type="date" id="transactionDate" required>
+        <select id="transactionCategory" required>
+          <option value="">請選擇分類</option>
+          <option value="餐飲">🍔 餐飲</option>
+          <option value="交通">🚌 交通</option>
+          <option value="娛樂">🎮 娛樂</option>
+          <option value="購物">🛍️ 購物</option>
+          <option value="薪水">💰 薪水</option>
+          <option value="投資">📈 投資</option>
+          <option value="其他">✨ 其他</option>
+        </select>
+        <input type="number" id="transactionAmount" placeholder="金額" min="0" required>
+        <button type="submit">新增</button>
+      </form>
+      <div id="successMessage" style="display:none; color: green;">新增成功！</div>
+    </section>
+
+    <!-- 月份控制 -->
+    <div id="controls">
+      <button id="prevMonth">◀ 上個月</button>
+      <span id="month">2025-04</span>
+      <button id="nextMonth">下個月 ▶</button>
     </div>
 
-    <canvas id="myChart" width="300" height="300"></canvas>
+    <!-- 圓餅圖 -->
+    <div id="chartContainer">
+      <canvas id="chart" width="300" height="300"></canvas>
+    </div>
 
+    <h2 id="totalAmount">本月總金額：$0</h2>
+
+    <!-- 明細列表 -->
     <section id="details">
       <h3>明細</h3>
-      <ul id="detailsList"></ul>
     </section>
+
+    <button id="downloadBtn">下載本月報表 📥</button>
   </main>
 
-  <div id="chartContainer"></div>
-  <h2 id="totalAmount">本月總金額：$0</h2>
-  <div id="chartContainer">
-    <canvas id="myChart"></canvas>
-  </div>
-
-  <div id="controls">
-    <button id="prevMonth">上個月</button>
-    <select id="monthSelector"></select>
-    <button id="nextMonth">下個月</button>
-  </div>
-  
-  
   <script src="script.js"></script>
 </body>
 </html>
-
-
-
-<button id="downloadBtn">下載本月報表 📥</button>
