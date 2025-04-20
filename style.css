@@ -1,178 +1,128 @@
-/* 整體頁面設定 */
+/* 頁面背景顏色 */
 body {
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f0f2f5;
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
 }
 
-header button.active, header button:hover {
-  background-color: #45a049;
-  color: white;
+/* 漢堡選單按鈕（固定在左上角） */
+#menuBtn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 28px;
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 1000; /* 確保在最上層顯示 */
 }
 
-/* 新增交易區塊 */
-#addTransactionSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 20px;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* 側邊欄樣式 */
+#sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #2F4F4F;
+    color: white;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    padding: 20px;
+    z-index: 999;
+    overflow-y: auto;
 }
 
-/* 表單 */
-#addTransactionForm {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 10px;
+/* 側邊欄標題 */
+#sidebar h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #FFD700;
 }
 
-#addTransactionForm select,
-#addTransactionForm input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
+/* 記帳紀錄顯示區 */
+#records {
+    margin-top: 20px;
 }
 
-#addTransactionForm button {
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+/* 記帳紀錄樣式 */
+.record {
+    background-color: #ffffff;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-#addTransactionForm button:hover {
-  background-color: #45a049;
+.record p {
+    margin: 5px 0;
+    color: #333;
 }
 
-/* 月份切換區塊 */
-#controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px;
-  gap: 10px;
+/* 主頁標題 */
+header h1 {
+    text-align: center;
+    padding: 30px 0;
+    background-color: #4CAF50;
+    color: white;
+    margin: 0;
+    font-size: 36px;
+    letter-spacing: 2px;
 }
 
-#controls button, #controls select {
-  padding: 8px 16px;
-  font-size: 14px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+/* 記帳表單 */
+form {
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
 }
 
-/* 標題與金額 */
-#currentMonth, #totalAmount {
-  text-align: center;
-  margin: 10px 0;
+/* 記帳表單欄位 */
+form label {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #4CAF50;
 }
 
-/* 圖表 */
-#chartContainer {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
+form input,
+form select,
+form button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
 }
 
-/* 明細 */
-#details {
-  margin: 20px;
+form button {
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
 }
 
-#details h3 {
-  text-align: center;
+form button:hover {
+    background-color: #45a049;
 }
 
-#detailsList {
-  list-style: none;
-  padding: 0;
+/* 隱藏/顯示側邊欄 */
+#sidebar.show {
+    transform: translateX(0);
 }
 
-/* 下載按鈕 */
-#downloadBtn {
-  display: block;
-  margin: 30px auto;
-  padding: 10px 20px;
-  background-color: #2196F3;
-  color: white;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+
+/* 記帳紀錄 - 收入 */
+.record.income {
+    color: green; /* 綠色顯示收入 */
 }
 
-#downloadBtn:hover {
-  background-color: #1976D2;
-}
-
-#typeSelector {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-#typeSelector button {
-  padding: 10px 20px;
-  border: 2px solid #4CAF50;
-  background-color: white;
-  color: #4CAF50;
-  font-size: 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-#typeSelector button.active {
-  background-color: #4CAF50;
-  color: white;
-}
-
-#typeSelector {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-#typeSelector button {
-  padding: 10px 20px;
-  border: 2px solid gray;
-  background-color: white;
-  color: gray;
-  font-size: 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-#typeSelector button.expense {
-  border-color: #f44336;
-  color: #f44336;
-}
-
-#typeSelector button.income {
-  border-color: #2196f3;
-  color: #2196f3;
-}
-
-#typeSelector button.active.expense {
-  background-color: #f44336;
-  color: white;
-}
-
-#typeSelector button.active.income {
-  background-color: #2196f3;
-  color: white;
+/* 記帳紀錄 - 支出 */
+.record.expense {
+    color: red; /* 紅色顯示支出 */
 }

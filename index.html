@@ -1,60 +1,55 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <title>記帳本</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簡單記帳本</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main>
-    <!-- 新增交易區塊放在最上方 -->
-    <section id="addTransactionSection">
-      <h2>新增交易</h2>
-      <form id="addTransactionForm">
+    <!-- 漢堡選單按鈕 -->
+    <button id="menuBtn">☰</button>
+
+    <!-- 側邊欄 -->
+    <div id="sidebar" class="hidden">
+        <h2>記帳紀錄</h2>
+        <div id="records"></div>
+    </div>
+
+    <!-- 主頁內容 -->
+    <header>
+        <h1>簡單記帳本</h1>
+    </header>
+
+    <!-- 新增記帳表單 -->
+    <form id="recordForm">
+        <label for="date">日期：</label>
+        
+        <input type="date" id="date" required>
+        <label for="transactionType">類型：</label>
         <select id="transactionType">
-          <option value="expense">支出</option>
-          <option value="income">收入</option>
+            <option value="income">收入</option>
+            <option value="expense">支出</option>
         </select>
-        <input type="date" id="transactionDate" required>
-        <select id="transactionCategory" required>
-          <option value="">請選擇分類</option>
-          <option value="餐飲">🍔 餐飲</option>
-          <option value="交通">🚌 交通</option>
-          <option value="娛樂">🎮 娛樂</option>
-          <option value="購物">🛍️ 購物</option>
-          <option value="薪水">💰 薪水</option>
-          <option value="投資">📈 投資</option>
-          <option value="其他">✨ 其他</option>
+        
+        <label for="category">類別：</label>
+        <select id="category">
+            <option value="飲食">飲食</option>
+            <option value="交通">交通</option>
+            <option value="生活用品">生活用品</option>
+            <option value="娛樂">娛樂</option>
+            <option value="其他">其他</option>
         </select>
-        <input type="number" id="transactionAmount" placeholder="金額" min="0" required>
-        <button type="submit">新增</button>
-      </form>
-      <div id="successMessage" style="display:none; color: green;">新增成功！</div>
-    </section>
 
-    <!-- 月份控制 -->
-    <div id="controls">
-      <button id="prevMonth">◀ 上個月</button>
-      <span id="month">2025-04</span>
-      <button id="nextMonth">下個月 ▶</button>
-    </div>
+        <label for="amount">金額：</label>
+        <input type="number" id="amount" required>
 
-    <!-- 圓餅圖 -->
-    <div id="chartContainer">
-      <canvas id="chart" width="300" height="300"></canvas>
-    </div>
+        <label for="note">備註：</label>
+        <input type="text" id="note">
 
-    <h2 id="totalAmount">本月總金額：$0</h2>
+        <button type="submit">新增記帳</button>
+    </form>
 
-    <!-- 明細列表 -->
-    <section id="details">
-      <h3>明細</h3>
-    </section>
-
-    <button id="downloadBtn">下載本月報表 📥</button>
-  </main>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
