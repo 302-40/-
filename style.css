@@ -126,3 +126,13 @@ form button:hover {
 .record.expense {
     color: red; /* 紅色顯示支出 */
 }
+
+/* 收入與支出金額顯示顏色 */
+.record.expense p:nth-child(3) {
+    color: red;
+  }
+  
+  .record.income p:nth-child(3) {
+    color: green;
+  }
+  

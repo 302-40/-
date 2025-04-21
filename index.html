@@ -10,12 +10,21 @@
     <!-- 漢堡選單按鈕 -->
     <button id="menuBtn">☰</button>
 
-    <!-- 側邊欄 -->
     <div id="sidebar" class="hidden">
         <h2>記帳紀錄</h2>
+      
+        <!-- 篩選選單 -->
+        <label for="filterType">篩選類型：</label>
+        <select id="filterType">
+          <option value="all">全部</option>
+          <option value="income">收入</option>
+          <option value="expense">支出</option>
+        </select>
+      
+        <!-- 記帳紀錄清單 -->
         <div id="records"></div>
-    </div>
-
+      </div>
+      
     <!-- 主頁內容 -->
     <header>
         <h1>簡單記帳本</h1>
@@ -24,8 +33,8 @@
     <!-- 新增記帳表單 -->
     <form id="recordForm">
         <label for="date">日期：</label>
-        
         <input type="date" id="date" required>
+        
         <label for="transactionType">類型：</label>
         <select id="transactionType">
             <option value="income">收入</option>
@@ -34,12 +43,17 @@
         
         <label for="category">類別：</label>
         <select id="category">
+            <option value="薪水">薪水</option>
             <option value="飲食">飲食</option>
             <option value="交通">交通</option>
             <option value="生活用品">生活用品</option>
             <option value="娛樂">娛樂</option>
             <option value="其他">其他</option>
+            <option value="custom">自訂</option>
         </select>
+
+        <!-- 自訂類別輸入框，預設為隱藏 -->
+        <input type="text" id="customCategory" placeholder="請輸入自訂類別" style="display: none;">
 
         <label for="amount">金額：</label>
         <input type="number" id="amount" required>
@@ -53,3 +67,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
